@@ -12,3 +12,25 @@ self.addEventListener("install", (ev) => {
             //return cache.addAll(urlsToCache);
         }));
 });
+
+self.addEventListener("message", ({ data }) => {
+    console.log("got a message", data);
+    switch(data.action){
+        case "installUpdate": 
+            self.skipWaiting();
+            break;
+    }
+});
+
+self.addEventListener("activate", (ev) => {
+    ev.waitUntil(caches.keys()
+        .then((keyList) => {
+            return Promise.all(keyList.map(function (key) {
+                if (CACHE_NAME.indexOf(key) === -1) {
+                    return caches.delete(key);
+                }
+            }));
+        })
+    );
+});
+
